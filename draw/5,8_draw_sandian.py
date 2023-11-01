@@ -1,55 +1,47 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import draw.draw as draw
-import global_config.config as gc
+import matplotlib.dates as mdates
+import openpyxl
+import config as gcc
+gc = gcc.get_config()
 import pandas as pd
-
-stations=gc.experiment_stations
-
-models = ['mod',
-        'attention_lyr1_8','attention_val_E32_lyr16_8'
-    ]
-
-# models.append('/mod')
-model_group = 'attention_group_swish'
-model_groups=gc.module_group
-
-
-
-
-mo_dict = {'attention_group_swish/attention_lyr1_8':'智能模型6',
-               'attention_group_swish/attention_val_E32_lyr16':'智能模型1',
-    'attention_group_swish/attention_val_E32_lyr16_8':'智能模型2',
-    'attention_group_swish/attention_val_E64_lyr32':'智能模型3',
-    'attention_group_swish/attention_val_E64_lyr32_16':'智能模型4',
-    'attention_group_swish/attention_val_E64_lyr32_16_8':'智能模型5',
-    'attention_group_swish/attention_val_lyr1_8':'智能模型7',
-
-               'mod':'数值模型'
-    }
-
-file_dir= gc.analysis_directory + '/'  + gc.datasets_name
-
-file=file_dir + '/' + model_group + '/preds_label.xlsx'
-
-stations=[ '北礵',  '同心湾2号','姥屿','榕海Ⅳ号','港南','湄洲岛', '筶杯岛', '闽江口1号', '鸟屿']
-
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文
 plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
+stations=gc.experiment_stations
 
+
+stations=gc.experiment_stations
+# model_dict = {'attention_group_swish':'attention_val_lyr1_8',
+#               'BW_group':'BP',
+#               'gru_group':'gru_dense_sum',
+#               'lstm_group':'lstm_dense_sum',
+#               'm_attention_p_group':'Attention_do_chl_qw_qy',}
+# model_groups=['attention_group_swish','BW_group','gru_group','lstm_group','m_attention_p_group',]
+
+models = ['mod',
+         # 'attention_group_swish/attention_val_lyr1_8',
+         # 'BW_group/BP',
+         # 'gru_group/gru_dense_sum',
+         # 'lstm_group/lstm_dense_sum',
+         # 'Nbeats/nbeats',
+         'm_attention_p_group/Attention_do_chl_qw_qy',
+          ]
 
 i=0
 
-for station in stations:
-    df = pd.read_excel(file, sheet_name=station, engine='openpyxl')
+for station0 in stations:
+    station = station0['station']
+    split_dt = station0['split_dt']
+
+    dir = 'station_error.xlsx'
+    df = pd.read_excel(dir,sheet_name=station)
+
     obs = df["观察值"]
 
     fig = plt.figure(figsize=(48, 48), dpi=300)
 
     ty=0.1
-
-    model_name = 'mod'
 
     i=0
 
@@ -57,13 +49,9 @@ for station in stations:
 
         fig, ax = plt.subplots()
 
-        if model != 'mod':
-            model_name = model_group + '/' + model
+        pred = df[model]
 
-
-        pred = df[model_name]
-
-        ax.scatter(obs, pred,label=mo_dict[model_name])
+        ax.scatter(obs, pred,s=0.5, label=model)
 
         ax.plot(obs, obs, "k--")
         z = np.polyfit(obs, pred, 1)
@@ -72,7 +60,7 @@ for station in stations:
 
         slope = z[0]
 
-        ax.text(0.7, ty, f"{mo_dict[model_name]}_Slope: %.2f" % slope, transform=ax.transAxes)
+        ax.text(0.7, ty, f"Slope: %.2f" % slope, transform=ax.transAxes)
         # ty=ty+0.1
 
         ax.legend(fontsize=12)
@@ -84,7 +72,7 @@ for station in stations:
 
         i=i+1
 
-        fig.suptitle(f"{station}:{mo_dict[model_name]}", fontsize=15)
+        fig.suptitle(f"{station}:{model}", fontsize=15)
 
         save_dir = "picture/sandian5/" + station + '/'
 
@@ -92,10 +80,10 @@ for station in stations:
             os.makedirs(save_dir)
 
         # # 保存为矢量图 (SVG格式)
-        plt.savefig(save_dir + f'{model}.png',format='png', bbox_inches="tight", dpi=300)
+        plt.savefig(save_dir + f'model_{i}.png',format='png', bbox_inches="tight", dpi=300)
 
 
         # 显示图形
         # plt.show()
         plt.close()
-        print(save_dir + ".svg___saved!")
+        print(save_dir + ".png___saved!")

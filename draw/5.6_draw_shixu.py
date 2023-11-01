@@ -2,80 +2,64 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import matplotlib.dates as mdates
-import draw.draw as draw
-import global_config.config as gc
+import openpyxl
+import config as gcc
+gc = gcc.get_config()
 import pandas as pd
 
-
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文
+plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 
 
 stations=gc.experiment_stations
+model_dict = {'attention_group_swish':'attention_val_lyr1_8',
+              'BW_group':'BP',
+              'gru_group':'gru_dense_sum',
+              'lstm_group':'lstm_dense_sum',
+              'm_attention_p_group':'Attention_do_chl_qw_qy',}
+# model_groups=['attention_group_swish','BW_group','gru_group','lstm_group','m_attention_p_group',]
+model_groups = [ 'm_attention_p_group', ]
+mod_label=['obs','mod','mk2']
 
-# models=gc.training_model
-models = ['mod',
-        'attention_lyr1_8','attention_val_E32_lyr16_8'
-    ]
-
-# models.append('/mod')
-model_group = 'attention_group_swish'
-model_groups=gc.module_group
-
-errors = ['rmse','mae']
-dir = 'analysis/only_obs_tm/'
-
-mo_dict = {'attention_group_swish/attention_lyr1_8':'智能模型6',
-               'attention_group_swish/attention_val_E32_lyr16':'智能模型1',
-    'attention_group_swish/attention_val_E32_lyr16_8':'智能模型2',
-    'attention_group_swish/attention_val_E64_lyr32':'智能模型3',
-    'attention_group_swish/attention_val_E64_lyr32_16':'智能模型4',
-    'attention_group_swish/attention_val_E64_lyr32_16_8':'智能模型5',
-    'attention_group_swish/attention_val_lyr1_8':'智能模型7',
-
-               'mod':'数值模型'
-    }
-mod_label=['观察值']
-for model in models:
-    if model != 'mod':
-        model = model_group + '/' + model
-
-    mod_label.append(mo_dict[model])
-
-    # 创建图形
-# fig = plt.figure(figsize=(60, 30), dpi=300)
 plt.rcParams['font.size'] = 80
 i=0
-for station in stations:
-    station = station['station']
-
+for station0 in stations:
+    station = station0['station']
+    split_dt = station0['split_dt']
     fig = plt.figure(figsize=(60, 30), dpi=300)
+    ax = fig.add_subplot(3, 2, 1)
 
-    df= pd.read_excel(dir+'preds_label.xlsx',sheet_name=station)
+    # dir = f'errors/data_obs_72_48/{station}/{model_group}/{model_dict[model_group]}.xlsx'
+    dir = f'errors/data_obs/{station}/mod.xlsx'
+    df= pd.read_excel(dir)
 
     # 将时间列转换为索引
     df = df.set_index('时间')
-
     # 重新采样为每个小时一个时间点，空缺的值为 NaN
     df = df.resample('1H').asfreq()
-
     # 将索引还原为列
     df = df.reset_index()
-
-    plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文
-    plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
-
-    ax = fig.add_subplot(3, 2, 1 )
 
     x = pd.to_datetime(df['时间'])
     y = df['观察值']
     ax.plot(x, y)
+    z = df['mod']
+    ax.plot(x, z)
 
-    for model in models:
+    for model_group in model_groups:
+        dir = f'errors/data_obs/{station}/{model_group}/{model_dict[model_group]}.xlsx'
+        df = pd.read_excel(dir)
+        # 将时间列转换为索引
+        df = df.set_index('时间')
+        # 重新采样为每个小时一个时间点，空缺的值为 NaN
+        df = df.resample('1H').asfreq()
+        # 将索引还原为列
+        df = df.reset_index()
+        x = pd.to_datetime(df['时间'])
+        y = df[f'{model_group}/{model_dict[model_group]}']
+        ax.plot(x, y)
 
-        if model !='mod':
-            model = model_group + '/' + model
-
-        z = df[model]
-        ax.plot(x, z)
+    ax.axvline(x=pd.to_datetime(split_dt), linestyle='--')
 
     ax.xaxis.set_major_locator(mdates.MonthLocator())
     date_fmt = mdates.DateFormatter('%Y-\n%m-%d')
@@ -98,6 +82,6 @@ for station in stations:
     plt.savefig(save_dir + f'/{station}.png',format='png', bbox_inches="tight", dpi=300)
 
     # 显示图形
-    # plt.show()
+    plt.show()
     plt.close()
     print(save_dir + f'/{station}___saved!')
