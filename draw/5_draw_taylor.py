@@ -1,7 +1,6 @@
 # 定义函数
 import numpy as np
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import cmaps
@@ -11,7 +10,7 @@ import draw as draw
 
 import config as gcc
 gc = gcc.get_config()
-import pandas as pd
+
 
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文
 plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
@@ -20,7 +19,7 @@ plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 stations=gc.experiment_stations
 
 
-plt.rcParams['font.size'] = 26
+plt.rcParams['font.size'] = 14
 
 for station in stations:
 
@@ -32,7 +31,7 @@ for station in stations:
 
     df=pd.read_excel('for泰勒图.xlsx',sheet_name=station)
 
-    fig = plt.figure(figsize=(24, 16), dpi=300)
+    fig = plt.figure(figsize=(10, 8), dpi=300)
 
     r=df['R']
     # mse = df['MSE']
