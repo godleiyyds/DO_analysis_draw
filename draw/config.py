@@ -15,13 +15,13 @@ def get_config():
 
     ##气温、气压
     default_stations = [
-        {'station': '北礵', 'split_dt': '2020-04-01 00:00:00'},
-        # {'station': '姥屿', 'split_dt': '2021-12-01 00:00:00'},
-        # {'station': '筶杯岛', 'split_dt': '2021-10-01 00:00:00'},
-        # {'station': '港南', 'split_dt': '2021-10-01 00:00:00'},
-        # {'station': '闽江口1号', 'split_dt': '2021-07-01 00:00:00'},
-        # {'station': '榕海Ⅳ号', 'split_dt': '2021-03-01 00:00:00'},
-        # {'station': '鸟屿', 'split_dt': '2021-04-01 00:00:00'},
+        {'station': '姥屿', 'split_dt': '2021-12-01 00:00:00','zimu': 'Station A'},
+        {'station': '北礵', 'split_dt': '2020-04-01 00:00:00','zimu': 'Station B'},
+        {'station': '榕海Ⅳ号', 'split_dt': '2021-03-01 00:00:00','zimu': 'Station C'},
+        {'station': '闽江口1号', 'split_dt': '2021-07-01 00:00:00','zimu': 'Station D'},
+        {'station': '筶杯岛', 'split_dt': '2021-10-01 00:00:00','zimu': 'Station E'},
+        {'station': '鸟屿', 'split_dt': '2021-04-01 00:00:00','zimu': 'Station F'},
+        {'station': '港南', 'split_dt': '2021-10-01 00:00:00','zimu': 'Station G'},
 
         # {'station': '湄洲岛', 'split_dt': '2021-04-01 00:00:00'},
         # {'station': '同心湾2号', 'split_dt': '2021-10-01 00:00:00'},

@@ -3,7 +3,8 @@ import pandas as pd
 import seaborn as sns
 import os
 import matplotlib.pyplot as plt
-import global_config.config as gc
+import config as gcc
+gc = gcc.get_config()
 
 
 stations=gc.experiment_stations
